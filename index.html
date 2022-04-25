@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go WebSocket</title>
+</head>
+<body>
+    <h3>チャットテスト</h1>
+    <div>
+        <label>名前 <input type="text" id="name" value="ななし" size="10" /></label>
+        <label>内容 <input type="text" id="msg" /></label>
+        <input type="button" id="send" value="送信" />
+    </div>
+    <hr/>
+    <div id="inbox"></div>
+    
+    <script>
+        const el = (id) => document.getElementById(id)
+
+        window.onload = () => {
+            const ws = new WebSocket("ws://" + window.location.host + "/ws")
+
+            ws.onopen = () => {
+                console.log("connected")
+            }
+
+            ws.onmessage = (e) => {
+                const recdMsg = e.data;
+                el("inbox").innerHTML += recdMsg + "<br/>"
+            }
+
+            const sendMessage = () => {
+                const name = el("name").value
+                const msg = el("msg").value
+                ws.send(name + "さん : " + msg )
+            }
+
+            // 送信ボタン クリック
+            el("send").addEventListener("click", (e) => {
+                sendMessage()
+            })
+
+            // 内容テキスト エンターキー押下
+            el("msg").addEventListener("keypress", (e) => {
+                if (e.keyCode === 13) sendMessage()
+            })
+        }
+    </script>
+</body>
+</html>
