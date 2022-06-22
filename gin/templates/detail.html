@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style type="text/css" media="screen">
+    @import url("/assets/css/style.css");
+  </style>
+  <title>Gin Sample </title>
+</head>
+<body>
+  <h1>編集</h1>
+
+  <form action="/update/{{.todo.ID}}" method="post">
+    <p>
+      内容
+      <input type="text" name="text" size="30" value="{{.todo.Text}}">
+    </p>
+    <p>
+      状態
+      <select name="status">
+        {{ if eq .todo.Status "未着手" }}
+          <option value="未着手" selected>未着手</option>
+          <option value="実行中">実行中</option>
+          <option value="完了">完了</option>
+        {{ else if eq .todo.Status "実行中" }}
+          <option value="未着手">未着手</option>
+          <option value="実行中" selected>実行中</option>
+          <option value="完了">完了</option>
+        {{ else }}
+          <option value="未着手">未着手</option>
+          <option value="実行中">実行中</option>
+          <option value="完了" selected>完了</option>
+        {{ end }}
+      </select>
+    </p>
+    <p><input type="submit" value="編集"></p>
+  </form>
+
+</body>
+</html>

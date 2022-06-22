@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style type="text/css" media="screen">
+    @import url("/assets/css/style.css");
+  </style>
+  <title>Gin Sample </title>
+</head>
+<body>
+  <h1>TODOリスト</h1>
+  <form action="/new" method="post">
+    <p>
+      内容
+      <input type="text", name="text", size="30", placeholder="TODOを入力してください">
+    </p>
+    <p>
+      状態
+      <select name="status">
+        <option value="未着手">未着手</option>
+        <option value="実行中">実行中</option>
+        <option value="完了">完了</option>
+      </select>
+    </p>
+    <p><input type="submit" value="追加"></p>
+  </form>
+
+  <ul>
+    {{ range .todos }}
+      <li>
+        内容: {{ .Text }}, 状態: {{ .Status }}
+        <label><a href="/detail/{{.ID}}">編集</a></label>
+        <label><a href="/delete_check/{{.ID}}">削除</a></label>
+      </li>
+    {{ end }}
+  </ul>
+
+</body>
+</html>

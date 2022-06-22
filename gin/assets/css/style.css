@@ -1,0 +1,26 @@
+body {
+  padding: 1rem;
+}
+
+h1 {
+	padding: 0.1em 0.3em;
+	border-left: 10px solid #1E88E5;
+	border-bottom: 3px solid #B0BEC5;
+}
+
+
+ul, ol {
+    background: #f1f8ff;
+    box-shadow: 0px 0px 0px 10px #f1f8ff;
+    border: dashed 2px #668ad8;
+    border-radius: 9px;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 0.5em 0.5em 0.5em 2em;
+  }
+
+  ul li, ol li {
+    line-height: 1.5;
+    padding: 0.5em 0;
+  }
+  
