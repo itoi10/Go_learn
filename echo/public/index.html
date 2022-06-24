@@ -66,5 +66,33 @@
     </table>
   </div>
 
+  <div>
+    <h3>todo更新 PUT /api/todos/:id/completed </h3>
+    <table border="1">
+      <tr>
+      <th>Request</td>
+      <td>curl -X PUT localhost:8080/api/todos/1/completed -H "Authorization: Bearer (JWTトークン)"</td>
+      </tr>
+      <tr>
+        <th>Resopnse</td>
+        <td>(No Content)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div>
+    <h3>todo削除 DELETE /api/todos/:id </h3>
+    <table border="1">
+      <tr>
+      <th>Request</td>
+      <td>curl -X DELETE localhost:8080/api/todos/1 -H "Authorization: Bearer (JWTトークン)"</td>
+      </tr>
+      <tr>
+        <th>Resopnse</td>
+        <td>(No Content)</td>
+      </tr>
+    </table>
+  </div>
+
 </body>
 </html>

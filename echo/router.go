@@ -26,10 +26,12 @@ func newRouter() *echo.Echo {
 
 	/* APIエンドポイント */
 	api := e.Group("/api")
-	// apiしたはJWT認証が必要
+	// apiはJWT認証が必要
 	api.Use(middleware.JWTWithConfig(handler.Config))
 	api.POST("/todos", handler.AddTodo)
 	api.GET("/todos", handler.GetTodos)
+	api.PUT("/todos/:id/completed", handler.UpdateTodo)
+	api.DELETE("/todos/:id", handler.DeleteTodo)
 
 	return e
 }
