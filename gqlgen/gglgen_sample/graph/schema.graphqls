@@ -23,9 +23,14 @@ type User {
   name: String!
 }
 
+# データを取得するための形式はQuery
+
 type Query {
   todos: [Todo!]!
+
 }
+
+# 更新するための形式はMutaion
 
 input NewTodo {
   text: String!
