@@ -1,0 +1,37 @@
+# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
+
+# GraphQLスキーマ
+# GraphQL APIの仕様を表現するもの
+# スキーマ定義言語 SLD (Schema Definition Language)
+
+# gqlgenはスキーマファーストでGraphQLサーバーを生成する
+# このファイルを元に他のファイルが生成される
+
+# !はnullにならないことを意味する
+
+type Todo {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  todos: [Todo!]!
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
+}
+
+type Mutation {
+  createTodo(input: NewTodo!): Todo!
+}
