@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package helloworld;
+
+option go_package = "helloworld/proto";
+
+service Greeter {
+    // 関数的なもの
+    rpc SayHello(HelloRequest) returns (HelloReply);
+    rpc SayRepeatHello(RepeatHelloRequest) returns (stream HelloReply);
+}
+
+message HelloRequest {
+    string name = 1;
+}
+
+message RepeatHelloRequest {
+    string name = 1;
+    int32 count = 2;
+}
+
+message HelloReply {
+    string message = 1;
+}
