@@ -13,11 +13,39 @@ client作成
 ```yarn dev```
 
 protocエラー
-```
+```sh
 $ sh generate_code.sh
 protoc-gen-js: program not found or is not executable
 ```
 
+grpc-client
+```sh
+$ grpc_cli ls localhost:9090 helloworld.Greeter -l
+filename: proto/helloworld.proto
+package: helloworld;
+service Greeter {
+  rpc SayHello(helloworld.HelloRequest) returns (helloworld.HelloReply) {}
+  rpc SayRepeatHello(helloworld.RepeatHelloRequest) returns (stream helloworld.HelloReply) {}
+}
+```
+
+起動
+
+go api
+```sh
+$ go run server.go
+```
+
+svelte client
+```sh
+$ yarn dev
+```
+
+envoy proxy
+```sh
+$ docker built -t envoy .
+$ docker run -it -p 8080:8080 envoy
+```
 
 ## 参考記事
 
