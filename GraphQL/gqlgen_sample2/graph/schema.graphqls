@@ -1,0 +1,45 @@
+# GraphQL schema
+
+type Pokemon {
+  id: ID!
+  name: String!
+  power: String
+  description: String
+}
+
+type Battle {
+  id: ID!
+  pokemon_id: String!
+  opponent: String!
+  location: String
+  date: String
+}
+
+input NewPokemon {
+  name: String!
+  Power: String
+  Description: String!
+  date: String!
+}
+
+input NewBattle {
+  pokemon_id: ID!
+  opponent: String!
+  location: String!
+}
+
+type Query {
+  GetPokemon(id: ID!): Pokemon!
+  ListPokemon: [Pokemon!]!
+  GetBattle(id: ID!): Battle!
+  ListBattle: [Battle!]!
+}
+
+type Mutation {
+  CreatePokemon(input: NewPokemon!): Pokemon!
+  DeletePokemon(id: ID!): Pokemon!
+  UpdatePokemon(input: NewPokemon!): Pokemon!
+  CreateBattle(input: NewBattle!): Battle!
+  DeleteBattle(id: ID!): Battle!
+  UpdateBattle(id: ID!): Battle!
+}
