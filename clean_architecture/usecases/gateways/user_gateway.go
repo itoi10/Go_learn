@@ -14,15 +14,15 @@ import (
 // UserRepository実装
 // firestoreに保存
 
-type FIrestoreClientFactory interface {
+type FirestoreClientFactory interface {
 	NewClient(ctx context.Context) (*firestore.Client, error)
 }
 
 type UserGateway struct {
-	clientFactory FIrestoreClientFactory
+	clientFactory FirestoreClientFactory
 }
 
-func NewUserRepository(clientFactory FIrestoreClientFactory) ports.UserRepository {
+func NewUserRepository(clientFactory FirestoreClientFactory) ports.UserRepository {
 	return &UserGateway{
 		clientFactory: clientFactory,
 	}
