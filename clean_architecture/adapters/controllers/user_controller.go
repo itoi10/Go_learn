@@ -38,9 +38,10 @@ func NewUserController(outputFactory OutputFactory, inputFactory InputFactory, r
 }
 
 func (u *UserController) AddUser(ctx context.Context) func(c echo.Context) error {
+
 	return func(c echo.Context) error {
 		user := new(entities.User)
-		if err := c.Bind(user); user != nil {
+		if err := c.Bind(user); err != nil {
 			return err
 		}
 

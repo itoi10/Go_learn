@@ -14,7 +14,7 @@ import (
 type MyFirestoreClientFactory struct{}
 
 func (f *MyFirestoreClientFactory) NewClient(ctx context.Context) (*firestore.Client, error) {
-	sa := option.WithCredentialsFile("credentialsFile.json")
+	sa := option.WithCredentialsFile("serviceAccountKey.json")
 	app, err := firebase.NewApp(ctx, nil, sa)
 	if err != nil {
 		return nil, err
