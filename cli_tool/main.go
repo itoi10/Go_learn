@@ -21,7 +21,9 @@ THE SOFTWARE.
 */
 package main
 
-import "cli_example/cmd"
+import (
+	"cli_example/cmd"
+)
 
 func main() {
 	cmd.Execute()
