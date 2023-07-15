@@ -1,0 +1,44 @@
+/*protoからgoのコードを自動生成
+
+src
+├── api
+│   └── hello.proto // protoファイル
+├── go.mod
+├── go.sum
+└── pkg
+    └── grpc // protoから生成されたgoのコードが入る
+
+前提 protobuf, protoc-gen-go-grpcインストール済み
+$ brew install protobuf
+$ go mod init mygrpc
+$ go get -u google.golang.org/grpc
+$ go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+コマンド
+$ cd api
+$ protoc --go_out=../pkg/grpc --go_opt=paths=source_relative \
+        --go-grpc_out=../pkg/grpc --go-grpc_opt=paths=source_relative \
+        hello.proto
+*/
+
+// proto version 'proto2' or 'proto3'
+// 明示しない場合はproto2として扱われる
+syntax = "proto3";
+
+// protoからgoのコードを自動生成するときの出力先
+option go_package = "pkg/grpc";
+
+// protoのパッケージ名
+package myapp;
+
+// Procedureをメソッド、それらをまとめたものをサービスと呼ぶ
+// サービスの定義
+service GreetingService {
+  // メソッドの定義
+  rpc Hello(HelloRequest) returns (HelloResponse);
+}
+
+// 型の定義
+message HelloRequest { string name = 1; }
+
+message HelloResponse { string message = 1; }
