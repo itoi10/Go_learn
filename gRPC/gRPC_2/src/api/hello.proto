@@ -11,11 +11,14 @@ package myapp;
 // Procedureをメソッド、それらをまとめたものをサービスと呼ぶ
 // サービスの定義
 service GreetingService {
-  // メソッドの定義
+  // Unary RPC
   rpc Hello(HelloRequest) returns (HelloResponse);
 
   // Server Streaming RPC
   rpc HelloServerStream(HelloRequest) returns (stream HelloResponse);
+
+  // Client Streaming RPC
+  rpc HelloClientStream(stream HelloRequest) returns (HelloResponse);
 }
 
 // 型の定義

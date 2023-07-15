@@ -47,6 +47,7 @@ func main() {
 	for {
 		fmt.Println("1: send Request(Unary)")
 		fmt.Println("2: send Request(Server Streaming)")
+		fmt.Println("3: send Request(Client Streaming)")
 		fmt.Println("9: exit")
 		fmt.Print("-> ")
 
@@ -59,6 +60,8 @@ func main() {
 			HelloUnary()
 		case "2":
 			HelloServerStream()
+		case "3":
+			HelloClientStream()
 
 		case "9":
 			fmt.Println("bye.")
@@ -117,4 +120,33 @@ func HelloServerStream() {
 		}
 		fmt.Printf("Response: %v\n", res.GetMessage())
 	}
+}
+
+func HelloClientStream() {
+	stream, err := client.HelloClientStream(context.Background())
+	if err != nil {
+		log.Fatalf("HelloClientStream failed: %v", err)
+		return
+	}
+
+	// 複数回サーバーに送信する
+	sendCount := 5
+	fmt.Printf("input your name %d times:\n", sendCount)
+	for i := 0; i < sendCount; i++ {
+		scanner.Scan()
+		name := scanner.Text()
+
+		if err := stream.Send(&hellopb.HelloRequest{Name: name}); err != nil {
+			log.Fatalf("Request Send failed: %v", err)
+			return
+		}
+	}
+
+	// サーバーからのレスポンスを受け取る
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalf("Response CloseAndRecv failed: %v", err)
+		return
+	}
+	fmt.Printf("Response: %v\n", res.GetMessage())
 }

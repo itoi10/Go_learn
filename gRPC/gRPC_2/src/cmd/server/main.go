@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	hellopb "mygrpc/pkg/grpc"
@@ -40,6 +43,24 @@ func (s *myServer) HelloServerStream(req *hellopb.HelloRequest, stream hellopb.G
 	}
 	// メソッドの終了がストリームの終了を意味する
 	return nil
+}
+
+// Client Streaming RPCのメソッドの実装
+func (s *myServer) HelloClientStream(stream hellopb.GreetingService_HelloClientStreamServer) error {
+	nameList := make([]string, 0)
+	// クライアントからのリクエストを受信
+	for {
+		req, err := stream.Recv()
+		// クライアントからのリクエストが終了したら、レスポンスを返して終了
+		if errors.Is(err, io.EOF) {
+			message := fmt.Sprintf("Hello %s", strings.Join(nameList, ", "))
+			return stream.SendAndClose(&hellopb.HelloResponse{Message: message})
+		}
+		if err != nil {
+			return err
+		}
+		nameList = append(nameList, req.GetName())
+	}
 }
 
 // myServer のコンストラクタ
