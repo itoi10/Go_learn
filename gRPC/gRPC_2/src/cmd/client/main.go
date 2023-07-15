@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 
 	hellopb "mygrpc/pkg/grpc"
@@ -36,7 +35,7 @@ func main() {
 		grpc.WithBlock(),
 	)
 	if err != nil {
-		log.Fatalf("Connection failed: %v", err)
+		fmt.Printf("Connection failed: %v", err)
 		return
 	}
 	defer conn.Close()
@@ -48,6 +47,7 @@ func main() {
 		fmt.Println("1: send Request(Unary)")
 		fmt.Println("2: send Request(Server Streaming)")
 		fmt.Println("3: send Request(Client Streaming)")
+		fmt.Println("4: send Request(Bidirectional Streaming)")
 		fmt.Println("9: exit")
 		fmt.Print("-> ")
 
@@ -62,6 +62,8 @@ func main() {
 			HelloServerStream()
 		case "3":
 			HelloClientStream()
+		case "4":
+			HelloBiStreams()
 
 		case "9":
 			fmt.Println("bye.")
@@ -84,7 +86,7 @@ func HelloUnary() {
 	// Helloメソッドを実行し、HelloResponse型のレスポンスを受け取る
 	res, err := client.Hello(context.Background(), req)
 	if err != nil {
-		log.Fatalf("HelloUnary failed: %v", err)
+		fmt.Printf("HelloUnary failed: %v", err)
 		return
 	}
 
@@ -102,7 +104,7 @@ func HelloServerStream() {
 	// HelloServerStreamメソッドを実行し、HelloResponse型のレスポンスを受け取る
 	stream, err := client.HelloServerStream(context.Background(), req)
 	if err != nil {
-		log.Fatalf("HelloServerStream failed: %v", err)
+		fmt.Printf("HelloServerStream failed: %v", err)
 		return
 	}
 
@@ -115,7 +117,7 @@ func HelloServerStream() {
 			break
 		}
 		if err != nil {
-			log.Fatalf("Response Recv failed: %v", err)
+			fmt.Printf("Response Recv failed: %v", err)
 			return
 		}
 		fmt.Printf("Response: %v\n", res.GetMessage())
@@ -125,7 +127,7 @@ func HelloServerStream() {
 func HelloClientStream() {
 	stream, err := client.HelloClientStream(context.Background())
 	if err != nil {
-		log.Fatalf("HelloClientStream failed: %v", err)
+		fmt.Printf("HelloClientStream failed: %v", err)
 		return
 	}
 
@@ -137,7 +139,7 @@ func HelloClientStream() {
 		name := scanner.Text()
 
 		if err := stream.Send(&hellopb.HelloRequest{Name: name}); err != nil {
-			log.Fatalf("Request Send failed: %v", err)
+			fmt.Printf("Request Send failed: %v", err)
 			return
 		}
 	}
@@ -145,8 +147,57 @@ func HelloClientStream() {
 	// サーバーからのレスポンスを受け取る
 	res, err := stream.CloseAndRecv()
 	if err != nil {
-		log.Fatalf("Response CloseAndRecv failed: %v", err)
+		fmt.Printf("Response CloseAndRecv failed: %v", err)
 		return
 	}
 	fmt.Printf("Response: %v\n", res.GetMessage())
+}
+
+func HelloBiStreams() {
+	stream, err := client.HelloBiStreams(context.Background())
+	if err != nil {
+		fmt.Printf("HelloBiStreams failed: %v", err)
+		return
+	}
+
+	sendNum := 5
+	fmt.Printf("input your name %d times:\n", sendNum)
+
+	sendEnd := false
+	recvEnd := false
+	sendCount := 0
+	for !(sendEnd && recvEnd) {
+		// 送信処理
+		if !sendEnd {
+			scanner.Scan()
+			name := scanner.Text()
+
+			sendCount += 1
+			if err := stream.Send(&hellopb.HelloRequest{Name: name}); err != nil {
+				fmt.Println("Request Send failed:", err)
+				sendEnd = true
+			}
+
+			if sendCount >= sendNum {
+				// 送信回数が上限に達したら送信終了
+				if err := stream.CloseSend(); err != nil {
+					fmt.Println("Request CloseSend failed:", err)
+				}
+				sendEnd = true
+			}
+		}
+
+		// 受信処理
+		if !recvEnd {
+			if res, err := stream.Recv(); err != nil {
+				if !errors.Is(err, io.EOF) {
+					fmt.Println("Response Recv failed:", err)
+				}
+				recvEnd = true
+			} else {
+				fmt.Printf("Response: %v\n", res.GetMessage())
+			}
+		}
+	}
+
 }

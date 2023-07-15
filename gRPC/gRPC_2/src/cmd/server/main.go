@@ -63,6 +63,24 @@ func (s *myServer) HelloClientStream(stream hellopb.GreetingService_HelloClientS
 	}
 }
 
+// Bidirectional Streaming RPCのメソッドの実装
+func (s *myServer) HelloBiStreams(stream hellopb.GreetingService_HelloBiStreamsServer) error {
+	// 1リクエストに対して1レスポンスを返す
+	for {
+		req, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		message := fmt.Sprintf("Hello %s", req.GetName())
+		if err := stream.Send(&hellopb.HelloResponse{Message: message}); err != nil {
+			return err
+		}
+	}
+}
+
 // myServer のコンストラクタ
 func NewMyServer() *myServer {
 	return &myServer{}
