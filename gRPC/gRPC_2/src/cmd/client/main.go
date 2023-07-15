@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 
@@ -43,8 +45,9 @@ func main() {
 	client = hellopb.NewGreetingServiceClient(conn)
 
 	for {
-		fmt.Println("1: send Request")
-		fmt.Println("2: exit")
+		fmt.Println("1: send Request(Unary)")
+		fmt.Println("2: send Request(Server Streaming)")
+		fmt.Println("9: exit")
 		fmt.Print("-> ")
 
 		// 標準入力から入力を受け取る
@@ -53,9 +56,11 @@ func main() {
 
 		switch in {
 		case "1":
-			Hello()
-
+			HelloUnary()
 		case "2":
+			HelloServerStream()
+
+		case "9":
 			fmt.Println("bye.")
 			goto END
 		}
@@ -64,7 +69,7 @@ func main() {
 END:
 }
 
-func Hello() {
+func HelloUnary() {
 	fmt.Println("input your name:")
 	scanner.Scan()
 	name := scanner.Text()
@@ -76,9 +81,40 @@ func Hello() {
 	// Helloメソッドを実行し、HelloResponse型のレスポンスを受け取る
 	res, err := client.Hello(context.Background(), req)
 	if err != nil {
-		log.Fatalf("Hello failed: %v", err)
+		log.Fatalf("HelloUnary failed: %v", err)
 		return
 	}
 
 	fmt.Printf("Response: %v\n", res.GetMessage())
+}
+
+func HelloServerStream() {
+	fmt.Println("input your name:")
+	scanner.Scan()
+	name := scanner.Text()
+
+	req := &hellopb.HelloRequest{
+		Name: name,
+	}
+	// HelloServerStreamメソッドを実行し、HelloResponse型のレスポンスを受け取る
+	stream, err := client.HelloServerStream(context.Background(), req)
+	if err != nil {
+		log.Fatalf("HelloServerStream failed: %v", err)
+		return
+	}
+
+	// サーバーからのレスポンスを受け取る
+	for {
+		res, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			// サーバーからのレスポンスが終了したら終了
+			fmt.Println("all response received.")
+			break
+		}
+		if err != nil {
+			log.Fatalf("Response Recv failed: %v", err)
+			return
+		}
+		fmt.Printf("Response: %v\n", res.GetMessage())
+	}
 }
