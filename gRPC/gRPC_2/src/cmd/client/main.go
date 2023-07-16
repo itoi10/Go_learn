@@ -10,8 +10,10 @@ import (
 
 	hellopb "mygrpc/pkg/grpc"
 
+	_ "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -86,7 +88,15 @@ func HelloUnary() {
 	// Helloメソッドを実行し、HelloResponse型のレスポンスを受け取る
 	res, err := client.Hello(context.Background(), req)
 	if err != nil {
-		fmt.Printf("HelloUnary failed: %v", err)
+		// grpcのエラーの詳細を取得する
+		if stat, ok := status.FromError(err); ok {
+			fmt.Printf("code: %v\n", stat.Code())
+			fmt.Printf("message: %v\n", stat.Message())
+			// errdetailsパッケージをインポートする必要がある
+			fmt.Printf("details: %v\n", stat.Details())
+		} else {
+			fmt.Println(err)
+		}
 		return
 	}
 

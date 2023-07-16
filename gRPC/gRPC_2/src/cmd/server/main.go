@@ -14,8 +14,11 @@ import (
 
 	hellopb "mygrpc/pkg/grpc"
 
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 // GreetingServiceServer の実装
@@ -26,6 +29,18 @@ type myServer struct {
 // Unary RPCのメソッドの実装
 func (s *myServer) Hello(ctx context.Context, req *hellopb.HelloRequest) (*hellopb.HelloResponse, error) {
 	log.Printf("Hello() called with: %v", req)
+
+	// サーバー側でエラーを発生させる
+	if req.GetName() == "error" {
+		stat := status.New(codes.Unknown, "unknown error occurred")
+		// エラーの詳細を追加
+		stat, _ = stat.WithDetails(&errdetails.DebugInfo{
+			Detail: "Hello() called with: " + req.GetName(),
+		})
+		err := stat.Err()
+		return nil, err
+	}
+
 	return &hellopb.HelloResponse{Message: "Hello " + req.GetName()}, nil
 }
 
