@@ -13,6 +13,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -88,8 +89,14 @@ func HelloUnary() {
 	req := &hellopb.HelloRequest{
 		Name: name,
 	}
+	// metadataを付与
+	ctx := context.Background()
+	md := metadata.New(map[string]string{"type": "unary", "from": "client"})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
 	// Helloメソッドを実行し、HelloResponse型のレスポンスを受け取る
-	res, err := client.Hello(context.Background(), req)
+	res, err := client.Hello(ctx, req)
+
 	if err != nil {
 		// grpcのエラーの詳細を取得する
 		if stat, ok := status.FromError(err); ok {
@@ -167,7 +174,12 @@ func HelloClientStream() {
 }
 
 func HelloBiStreams() {
-	stream, err := client.HelloBiStreams(context.Background())
+	// metadataを付与
+	ctx := context.Background()
+	md := metadata.New(map[string]string{"type": "stream", "from": "client"})
+	ctx = metadata.NewOutgoingContext(ctx, md)
+
+	stream, err := client.HelloBiStreams(ctx)
 	if err != nil {
 		fmt.Printf("HelloBiStreams failed: %v", err)
 		return

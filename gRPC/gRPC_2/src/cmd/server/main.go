@@ -17,6 +17,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 )
@@ -28,7 +29,12 @@ type myServer struct {
 
 // Unary RPCのメソッドの実装
 func (s *myServer) Hello(ctx context.Context, req *hellopb.HelloRequest) (*hellopb.HelloResponse, error) {
-	log.Printf("Hello() called with: %v", req)
+	log.Println("Hello() called with: ", req)
+
+	// metadataの取得
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		log.Println("metadata: ", md)
+	}
 
 	// サーバー側でエラーを発生させる
 	if req.GetName() == "error" {
@@ -80,6 +86,11 @@ func (s *myServer) HelloClientStream(stream hellopb.GreetingService_HelloClientS
 
 // Bidirectional Streaming RPCのメソッドの実装
 func (s *myServer) HelloBiStreams(stream hellopb.GreetingService_HelloBiStreamsServer) error {
+	// metadataの取得
+	if md, ok := metadata.FromIncomingContext(stream.Context()); ok {
+		log.Println("metadata: ", md)
+	}
+
 	// 1リクエストに対して1レスポンスを返す
 	for {
 		req, err := stream.Recv()
