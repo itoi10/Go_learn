@@ -36,6 +36,16 @@ func (s *myServer) Hello(ctx context.Context, req *hellopb.HelloRequest) (*hello
 		log.Println("metadata: ", md)
 	}
 
+	// サーバー側でmetadataを付与
+	headerMD := metadata.New(map[string]string{"type": "unary", "from": "server", "in": "header"})
+	if err := grpc.SendHeader(ctx, headerMD); err != nil {
+		return nil, err
+	}
+	trailerMD := metadata.New(map[string]string{"type": "unary", "from": "server", "in": "trailer"})
+	if err := grpc.SetTrailer(ctx, trailerMD); err != nil {
+		return nil, err
+	}
+
 	// サーバー側でエラーを発生させる
 	if req.GetName() == "error" {
 		stat := status.New(codes.Unknown, "unknown error occurred")
@@ -90,6 +100,19 @@ func (s *myServer) HelloBiStreams(stream hellopb.GreetingService_HelloBiStreamsS
 	if md, ok := metadata.FromIncomingContext(stream.Context()); ok {
 		log.Println("metadata: ", md)
 	}
+
+	// サーバー側でmetadataを付与
+	headerMD := metadata.New(map[string]string{"type": "stream", "from": "server", "in": "header"})
+	// すぐにheaderを送信する場合
+	if err := stream.SendHeader(headerMD); err != nil {
+		return err
+	}
+	// 本来headerを送るタイミングで送信する場合
+	// if err := stream.SetHeader(headerMD); err != nil {
+	// 	return err
+	// }
+	trailerMD := metadata.New(map[string]string{"type": "stream", "from": "server", "in": "trailer"})
+	stream.SetTrailer(trailerMD)
 
 	// 1リクエストに対して1レスポンスを返す
 	for {

@@ -94,8 +94,11 @@ func HelloUnary() {
 	md := metadata.New(map[string]string{"type": "unary", "from": "client"})
 	ctx = metadata.NewOutgoingContext(ctx, md)
 
+	// サーバー側のmetadataを受け取る変数
+	var header, trailer metadata.MD
+
 	// Helloメソッドを実行し、HelloResponse型のレスポンスを受け取る
-	res, err := client.Hello(ctx, req)
+	res, err := client.Hello(ctx, req, grpc.Header(&header), grpc.Trailer(&trailer))
 
 	if err != nil {
 		// grpcのエラーの詳細を取得する
@@ -110,6 +113,8 @@ func HelloUnary() {
 		return
 	}
 
+	fmt.Printf("header: %v\n", header)
+	fmt.Printf("trailer: %v\n", trailer)
 	fmt.Printf("Response: %v\n", res.GetMessage())
 }
 
@@ -213,7 +218,16 @@ func HelloBiStreams() {
 		}
 
 		// 受信処理
+		var headerMD metadata.MD
 		if !recvEnd {
+			if headerMD == nil {
+				if headerMD, err = stream.Header(); err != nil {
+					fmt.Println("Response Header failed:", err)
+				} else {
+					fmt.Printf("header: %v\n", headerMD)
+				}
+			}
+
 			if res, err := stream.Recv(); err != nil {
 				if !errors.Is(err, io.EOF) {
 					fmt.Println("Response Recv failed:", err)
@@ -224,5 +238,8 @@ func HelloBiStreams() {
 			}
 		}
 	}
+
+	trailerMD := stream.Trailer()
+	fmt.Printf("trailer: %v\n", trailerMD)
 
 }
